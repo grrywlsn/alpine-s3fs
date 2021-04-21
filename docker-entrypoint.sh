@@ -6,6 +6,10 @@ IFS=$'\n\t'
 
 export S3_ACL=${S3_ACL:-private}
 
+test $MOUNT_POINT
+sleep 10
+rm -rf ${MOUNT_POINT}
+sleep 10
 mkdir -p ${MOUNT_POINT}
 
 if [ "$IAM_ROLE" == "none" ]; then
