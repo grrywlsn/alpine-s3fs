@@ -6,25 +6,23 @@ set -o errtrace
 IFS=$'\n\t'
 
 export S3_ACL=${S3_ACL:-private}
+export UMASK=${UMASK:-000}
+export UID=${UID:-0}
+export GID=${GID:-0}
 
 if [ ! -d $MOUNT_POINT ]; then
   mkdir -p $MOUNT_POINT
-fi
-
-DEBUG_OPTION=""
-if [ $DEBUG = "true" ]; then
-  DEBUG_OPTION="-d -d"
 fi
 
 if [ "$IAM_ROLE" == "none" ]; then
   export AWSACCESSKEYID=${AWSACCESSKEYID:-$AWS_ACCESS_KEY_ID}
   export AWSSECRETACCESSKEY=${AWSSECRETACCESSKEY:-$AWS_SECRET_ACCESS_KEY}
 
-  echo 'IAM_ROLE is not set'
-  /usr/bin/s3fs $DEBUG_OPTION ${S3_BUCKET} ${MOUNT_POINT} -o nosuid,nonempty,nodev,allow_other,default_acl=${S3_ACL},umask=0000,retries=5
+  echo 'IAM_ROLE is not set - /usr/bin/s3fs ${S3_BUCKET} ${MOUNT_POINT} -o use_sse,nosuid,nonempty,nodev,allow_other,default_acl=${S3_ACL},retries=5,umask=${UMASK},uid=${UID},gid=${GID},dbglevel=info -o curldbg'
+  /usr/bin/s3fs ${S3_BUCKET} ${MOUNT_POINT} -o use_sse,nosuid,nonempty,nodev,allow_other,default_acl=${S3_ACL},retries=5,umask=${UMASK},uid=${UID},gid=${GID},dbglevel=info -o curldbg
 else
-  echo 'IAM_ROLE is set'
-  /usr/bin/s3fs $DEBUG_OPTION ${S3_BUCKET} ${MOUNT_POINT} -o iam_role=${IAM_ROLE},nosuid,nonempty,nodev,allow_other,default_acl=${S3_ACL},umask=0000,retries=5
+  echo 'IAM_ROLE is set - /usr/bin/s3fs ${S3_BUCKET} ${MOUNT_POINT} -o iam_role=${IAM_ROLE},use_sse,nosuid,nonempty,nodev,allow_other,default_acl=${S3_ACL},retries=5,umask=${UMASK},uid=${UID},gid=${GID},dbglevel=info -o curldbg'
+  /usr/bin/s3fs ${S3_BUCKET} ${MOUNT_POINT} -o iam_role=${IAM_ROLE},use_sse,nosuid,nonempty,nodev,allow_other,default_acl=${S3_ACL},retries=5,umask=${UMASK},uid=${UID},gid=${GID},dbglevel=info -o curldbg
 fi
 
 mounted=$(mount | grep s3fs | grep "${MOUNT_POINT}")
