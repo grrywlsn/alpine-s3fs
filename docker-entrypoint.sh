@@ -28,7 +28,6 @@ fi
 mounted=$(mount | grep s3fs | grep "${MOUNT_POINT}")
 if [ -n "${mounted}" ]; then
     echo "Mounted bucket ${S3_BUCKET} onto ${MOUNT_POINT}"
-    exec "$@"
 else
     echo "Mount failure - can't found mount"
 fi
