@@ -1,4 +1,4 @@
-FROM alpine:3.23.0
+FROM alpine:3.23.2
 
 ENV IAM_ROLE=none
 ENV MOUNT_POINT=/var/s3
